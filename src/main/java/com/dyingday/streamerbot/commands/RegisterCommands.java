@@ -1,10 +1,11 @@
-package com.dyingday.commands;
+package com.dyingday.streamerbot.commands;
 
-import com.dyingday.StreamerBot;
-import com.dyingday.utils.ExecutorType;
-import com.dyingday.utils.Reference;
+import com.dyingday.streamerbot.utils.ExecutorType;
+import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.User;
+
+import java.time.Instant;
 
 public class RegisterCommands
 {
@@ -20,8 +21,8 @@ public class RegisterCommands
                                     .setTitle(command.getName())
                                     .setDescription(command.getDescription())
                                     .addField("**Usage: **", command.getUsage(), false)
-                                    .setAuthor("Command Maestro", null, "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Infobox_info_icon.svg/1024px-Infobox_info_icon.svg.png");
-                /*TODO: Implement Temporal Accessor.setTimestamp()*/
+                                    .setAuthor("Command Maestro", null, "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Infobox_info_icon.svg/1024px-Infobox_info_icon.svg.png")
+                                    .setTimestamp(Instant.now());
 
                 privateChannel.sendMessage(emb.build()).queue();
             }

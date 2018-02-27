@@ -1,7 +1,6 @@
-package com.dyingday.listeners;
+package com.dyingday.streamerbot.discord;
 
-import com.dyingday.objects.Server;
-import com.dyingday.utils.Reference;
+import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.update.GuildUpdateOwnerEvent;
@@ -16,11 +15,11 @@ public class BotEventListener implements EventListener
     {
         if(event instanceof GuildJoinEvent)
         {
-            new Server(((GuildJoinEvent) event).getGuild().getIdLong());
+            new DiscordGuild(((GuildJoinEvent) event).getGuild().getIdLong());
         }
         else if(event instanceof GuildUpdateOwnerEvent)
         {
-            reference.servers.get(((GuildUpdateOwnerEvent) event).getGuild().getIdLong()).setOwner(((GuildUpdateOwnerEvent) event).getGuild().getOwner());
+            reference.discordGuilds.get(((GuildUpdateOwnerEvent) event).getGuild().getIdLong()).setOwner(((GuildUpdateOwnerEvent) event).getGuild().getOwner());
         }
     }
 }

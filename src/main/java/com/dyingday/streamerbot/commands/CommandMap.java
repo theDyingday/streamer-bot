@@ -1,19 +1,14 @@
-package com.dyingday.commands;
+package com.dyingday.streamerbot.commands;
 
-import com.dyingday.objects.Server;
-import com.dyingday.utils.ExecutorType;
-import com.dyingday.utils.Reference;
+import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class CommandMap
 {
@@ -46,23 +41,22 @@ public final class CommandMap
         }
     }
 
-    public boolean command(User user, Message message, MessageReceivedEvent event)
+    public void command(MessageReceivedEvent event)
     {
-        Object[] object = getCommand(message.getContentRaw());
+        Object[] object = getCommand(event.getMessage().getContentRaw());
         BaseCommand baseCommand = (BaseCommand) object[0];
         if(object[0] == null)
         {
-            return false;
+            return;
         }
         try
         {
-            execute(baseCommand, ((BaseCommand) object[0]).getName(), (String[])object[1], message);
+            execute(baseCommand, ((BaseCommand) object[0]).getName(), (String[])object[1], event);
         }
         catch (Exception e)
         {
             System.out.println("The method " + baseCommand.getMethod().getName() + " isn't correct!");
         }
-        return true;
     }
 
     private Object[] getCommand(String command)
@@ -77,23 +71,23 @@ public final class CommandMap
         return new Object[]{baseCommand, args};
     }
 
-    private void execute(BaseCommand baseCommand, String command, String[] args, Message message)
+    private void execute(BaseCommand baseCommand, String command, String[] args, MessageReceivedEvent event)
     {
         Parameter[] parameters = baseCommand.getMethod().getParameters();
         Object[] objects = new Object[parameters.length];
         for(int i = 0; i < parameters.length; i++)
         {
             if(parameters[i].getType() == String[].class) objects[i] = args;
-            else if(parameters[i].getType() == User.class) objects[i] = message == null ? null : message.getAuthor();
-            else if(parameters[i].getType() == TextChannel.class) objects[i] = message == null ? null : message.getTextChannel();
-            else if(parameters[i].getType() == PrivateChannel.class) objects[i] = message == null ? null : message.getPrivateChannel();
-            else if(parameters[i].getType() == Guild.class) objects[i] = message == null ? null : message.getGuild();
+            else if(parameters[i].getType() == User.class) objects[i] = event.getAuthor();
+            else if(parameters[i].getType() == TextChannel.class) objects[i] = event.getTextChannel();
+            else if(parameters[i].getType() == PrivateChannel.class) objects[i] = event.getPrivateChannel();
+            else if(parameters[i].getType() == Guild.class) objects[i] = event.getGuild();
             else if(parameters[i].getType() == String.class) objects[i] = command;
-            else if(parameters[i].getType() == Message.class) objects[i] = message;
+            else if(parameters[i].getType() == Message.class) objects[i] = event.getMessage();
             else if(parameters[i].getType() == JDA.class) objects[i] = reference.jda;
-            else if(parameters[i].getType() == MessageChannel.class) objects[i] = message == null ? null : message.getChannel();
+            else if(parameters[i].getType() == MessageChannel.class) objects[i] = event.getChannel();
             else if(parameters[i].getType() == BaseCommand.class) objects[i] = baseCommand;
-            else if(parameters[i].getType() == Server.class) objects[i] = message == null ? null : reference.servers.get(message.getGuild().getIdLong());
+            else if(parameters[i].getType() == DiscordGuild.class) objects[i] = reference.discordGuilds.get(event.getGuild().getIdLong());
         }
         try
         {

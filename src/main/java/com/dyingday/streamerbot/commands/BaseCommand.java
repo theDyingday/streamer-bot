@@ -1,7 +1,6 @@
-package com.dyingday.commands;
+package com.dyingday.streamerbot.commands;
 
-import com.dyingday.utils.ExecutorType;
-import net.dv8tion.jda.core.Permission;
+import com.dyingday.streamerbot.utils.ExecutorType;
 
 import java.lang.reflect.Method;
 

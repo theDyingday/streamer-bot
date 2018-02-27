@@ -1,6 +1,6 @@
-package com.dyingday.commands;
+package com.dyingday.streamerbot.commands;
 
-import com.dyingday.utils.ExecutorType;
+import com.dyingday.streamerbot.utils.ExecutorType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

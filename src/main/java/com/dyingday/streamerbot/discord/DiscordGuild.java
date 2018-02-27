@@ -1,23 +1,21 @@
-package com.dyingday.objects;
+package com.dyingday.streamerbot.discord;
 
-import com.dyingday.utils.Reference;
+import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
 
-public class Server
+public class DiscordGuild
 {
     private final long guildID;
     private Member owner;
     private String commandChar = "/";
     private Reference reference = Reference.getReference();
 
-    public Server(long guildID)
+    public DiscordGuild(long guildID)
     {
         this.guildID = guildID;
 
-        reference.servers.put(guildID, this);
-        System.out.println(reference.servers.size());
+        reference.discordGuilds.put(guildID, this);
 
         owner = getGuild().getOwner();
 
@@ -42,7 +40,7 @@ public class Server
         return owner;
     }
 
-    public void setOwner(Member member)
+    public void setOwner(Member owner)
     {
         this.owner = owner;
     }
