@@ -15,7 +15,7 @@ public class StreamerBot
 
     public StreamerBot() throws LoginException, InterruptedException
     {
-        reference.jda = new JDABuilder(AccountType.BOT).setToken("NDE4MDEyNzM0NTA5Mjg1Mzc2.DXbZoA.2AhIM_1I7LmG4rVxmINuYmTlwQ8").buildBlocking();
+        reference.jda = new JDABuilder(AccountType.BOT).setToken("token").buildBlocking();
         reference.jda.addEventListener(new BotEventListener());
         reference.jda.addEventListener(new MessageListener());
 
