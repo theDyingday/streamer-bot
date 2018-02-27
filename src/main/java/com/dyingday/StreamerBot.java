@@ -1,6 +1,8 @@
 package com.dyingday;
 
+import com.dyingday.commands.CommandMap;
 import com.dyingday.listeners.BotEventListener;
+import com.dyingday.listeners.MessageListener;
 import com.dyingday.utils.Reference;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
@@ -15,6 +17,9 @@ public class StreamerBot
     {
         reference.jda = new JDABuilder(AccountType.BOT).setToken("NDE4MDEyNzM0NTA5Mjg1Mzc2.DXbZoA.2AhIM_1I7LmG4rVxmINuYmTlwQ8").buildBlocking();
         reference.jda.addEventListener(new BotEventListener());
+        reference.jda.addEventListener(new MessageListener());
+
+        reference.commandMap = new CommandMap();
     }
 
     public static void main(String[] args)

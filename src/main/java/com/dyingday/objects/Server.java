@@ -9,7 +9,7 @@ public class Server
 {
     private final long guildID;
     private Member owner;
-    private char commandChar = '/';
+    private String commandChar = "/";
     private Reference reference = Reference.getReference();
 
     public Server(long guildID)
@@ -17,6 +17,7 @@ public class Server
         this.guildID = guildID;
 
         reference.servers.put(guildID, this);
+        System.out.println(reference.servers.size());
 
         owner = getGuild().getOwner();
 
@@ -46,7 +47,7 @@ public class Server
         this.owner = owner;
     }
 
-    public char getCommandChar()
+    public String getCommandChar()
     {
         return commandChar;
     }
