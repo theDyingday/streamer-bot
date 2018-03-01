@@ -1,6 +1,7 @@
 package com.dyingday.streamerbot.twitch;
 
-import org.jibble.pircbot.PircBot;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.jibble.pircbot.User;
 
 import java.util.ArrayList;
@@ -9,15 +10,19 @@ import java.util.Map;
 
 public class TwitchChannel
 {
-    private String channelName;
-    private long discordChannelID;
+    private Member owner;
+    private String channelName, commandChar = "/";
+    private TextChannel discordChannel;
     private ArrayList<User> OPs = new ArrayList<>();
     private Map<String, String> replies = new HashMap<>();
 
-    public TwitchChannel(String channelName, long discordChannelID)
+    private boolean streaming = false;
+
+    public TwitchChannel(Member owner, String channelName, TextChannel discordChannel)
     {
+        this.owner = owner;
         this.channelName = "#" + channelName;
-        this.discordChannelID = discordChannelID;
+        this.discordChannel = discordChannel;
     }
 
     public void addOp(User user)
@@ -36,6 +41,11 @@ public class TwitchChannel
         return OPs.toArray(users);
     }
 
+    public Member getOwner()
+    {
+        return owner;
+    }
+
     public String getChannelName()
     {
         return channelName;
@@ -51,13 +61,33 @@ public class TwitchChannel
         this.channelName = channelName;
     }
 
-    public long getDiscordChannelID()
+    public TextChannel getDiscordChannel()
     {
-        return discordChannelID;
+        return discordChannel;
     }
 
-    public void setDiscordChannelID(long discordChannelID)
+    public void setDiscordChannelID(TextChannel discordChannel)
     {
-        this.discordChannelID = discordChannelID;
+        this.discordChannel = discordChannel;
+    }
+
+    public String getCommandChar()
+    {
+        return commandChar;
+    }
+
+    public void setCommandChar(String commandChar)
+    {
+        this.commandChar = commandChar;
+    }
+
+    public boolean isStreaming()
+    {
+        return streaming;
+    }
+
+    public void setStreaming(boolean streaming)
+    {
+        this.streaming = streaming;
     }
 }

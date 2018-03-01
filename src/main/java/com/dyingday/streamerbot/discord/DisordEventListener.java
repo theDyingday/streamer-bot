@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 
-public class BotEventListener implements EventListener
+public class DisordEventListener implements EventListener
 {
     private Reference reference = Reference.getReference();
 

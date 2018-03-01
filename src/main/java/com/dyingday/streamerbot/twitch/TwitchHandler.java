@@ -2,6 +2,8 @@ package com.dyingday.streamerbot.twitch;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
 import com.dyingday.streamerbot.utils.Reference;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
@@ -13,16 +15,21 @@ public class TwitchHandler extends PircBot
 {
     static Reference reference = Reference.getReference();
 
-    public void init_twitch() throws IOException, IrcException
+    public TwitchHandler()
     {
-        connect("irc.twitch.tv", reference.TWITCH_PORT, reference.TWITCH_OAUTH);
-        setVerbose(true);
-        System.out.println("Successfully logged into Twitch!");
+        try
+        {
+            connect(reference.TWITCH_SERVER, reference.TWITCH_PORT);
+        }
+        catch (IOException | IrcException e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    public void addTwitchChannel(String channelName, long discordChannelID, DiscordGuild discordGuild)
+    public void addTwitchChannel(Member owner, String channelName, TextChannel discordChannel, DiscordGuild discordGuild)
     {
-        reference.twitchConnections.put(new TwitchChannel(channelName, discordChannelID), discordGuild);
+        reference.twitchConnections.put(new TwitchChannel(owner, channelName, discordChannel), discordGuild);
     }
 
     public TwitchChannel getChannel(String channelName)

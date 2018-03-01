@@ -3,9 +3,11 @@ package com.dyingday.streamerbot.utils;
 import com.dyingday.streamerbot.commands.BaseCommand;
 import com.dyingday.streamerbot.commands.CommandMap;
 import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.twitch.NewTwitchChannel;
 import com.dyingday.streamerbot.twitch.TwitchChannel;
 import com.dyingday.streamerbot.twitch.TwitchHandler;
 import net.dv8tion.jda.core.JDA;
+import org.kitteh.irc.client.library.Client;
 
 import java.awt.*;
 import java.util.Collection;
@@ -27,14 +29,19 @@ public class Reference
 
     public final int TWITCH_PORT = 6667;
     public final String TWITCH_OAUTH = "";
-    public final String DISCORD_TOKEN = "";
+    public final String TWITCH_NAME = "DiscordStreamer";
+    public final String TWITCH_SERVER = "irc.twitch.tv";
+
+    public final String DISCORD_TOKEN = "NDE4MDEyNzM0NTA5Mjg1Mzc2.DXhv5A.aBaUPTgxnEgk8AFpe2y2QeMH378";
 
     public Map<Long, DiscordGuild> discordGuilds = new HashMap<>();
     public Map<String, BaseCommand> commands = new HashMap<>();
     public Map<TwitchChannel, DiscordGuild> twitchConnections = new HashMap<>();
+    public Map<NewTwitchChannel, DiscordGuild> newTwitchConnections = new HashMap<>();
 
 
     public JDA jda;
+    public Client twitchClient;
     public TwitchHandler twitch;
     public CommandMap commandMap;
 

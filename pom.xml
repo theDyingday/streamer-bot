@@ -41,6 +41,12 @@
             <artifactId>pircbot</artifactId>
             <version>1.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.kitteh.irc</groupId>
+            <artifactId>client-lib</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>
