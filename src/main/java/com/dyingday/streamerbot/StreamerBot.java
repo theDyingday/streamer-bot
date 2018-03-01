@@ -9,13 +9,12 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 
 public class StreamerBot
 {
     private Reference reference = Reference.getReference();
 
-    public StreamerBot() throws LoginException, InterruptedException, IOException
+    public StreamerBot() throws LoginException, InterruptedException
     {
         reference.jda = new JDABuilder(AccountType.BOT).setToken(reference.DISCORD_TOKEN).buildBlocking();
         reference.jda.addEventListener(new DisordEventListener());
@@ -23,7 +22,7 @@ public class StreamerBot
 
         reference.commandMap = new CommandMap();
 
-        reference.twitch = new TwitchHandler();
+        new TwitchHandler();
     }
 
     public static void main(String[] args)
@@ -33,7 +32,7 @@ public class StreamerBot
         {
             new StreamerBot();
         }
-        catch (LoginException | InterruptedException | IOException e)
+        catch (LoginException | InterruptedException e)
         {
             e.printStackTrace();
         }

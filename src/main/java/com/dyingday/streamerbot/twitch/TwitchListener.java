@@ -4,14 +4,14 @@ import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
 
-public class NewTwitchListener
+public class TwitchListener
 {
     @Handler
     public void onUserJoin(ChannelJoinEvent event)
     {
         if(!event.getClient().isUser(event.getUser()))
         {
-            NewTwitchHandler.getTwitchChannel(event.getChannel()).addUser(event.getUser());
+            TwitchHandler.getTwitchChannel(event.getChannel()).addUser(event.getUser());
         }
     }
 
@@ -20,7 +20,7 @@ public class NewTwitchListener
     {
         if(!event.getClient().isUser(event.getUser()))
         {
-            NewTwitchHandler.getTwitchChannel(event.getChannel()).removeUser(event.getUser());
+            TwitchHandler.getTwitchChannel(event.getChannel()).removeUser(event.getUser());
             event.getChannel();
         }
     }

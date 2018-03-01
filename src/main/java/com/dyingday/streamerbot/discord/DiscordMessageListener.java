@@ -23,7 +23,7 @@ public class DiscordMessageListener extends ListenerAdapter
                 {
                     if(channel.isStreaming() && channel.getDiscordChannel().equals(event.getTextChannel()))
                     {
-                        reference.twitch.sendMessage(channel, event.getMember().getNickname() + ": " + event.getMessage());
+                        reference.twitch.sendMessage(channel.getChannel(), event.getMember().getNickname() + ": " + event.getMessage());
                     }
                 }
                 return;
