@@ -1,6 +1,7 @@
 package com.dyingday.streamerbot.commands;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.twitch.TwitchChannel;
 import com.dyingday.streamerbot.utils.ExecutorType;
 import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.JDA;
@@ -89,12 +90,12 @@ public final class CommandMap
         if(object[0] == null) return;
         else if(command.getMaxArgs() != -1 && args.length > command.getMaxArgs())
         {
-            reference.twitch.sendMessage(channel, sender + " you have entered too many arguments for the " + command.getName() + " command!");
+            reference.twitch.sendMessage(channel.getChannel(), sender + " you have entered too many arguments for the " + command.getName() + " command!");
             return;
         }
         else if(command.getMinArgs() != -1 && args.length < command.getMinArgs())
         {
-            reference.twitch.sendMessage(channel, sender + " you have entered too few arguments for the " + command.getName() + " command!");
+            reference.twitch.sendMessage(channel.getChannel(), sender + " you have entered too few arguments for the " + command.getName() + " command!");
             return;
         }
         else if(command.getExecutorType() == ExecutorType.DISCORD)

@@ -19,21 +19,18 @@ import java.util.Map;
 
 public class MusicManager
 {
-    private Reference reference = Reference.getReference();
+    private static Reference reference = Reference.getReference();
 
-    private final AudioPlayerManager apm;
-    public final Map<DiscordGuild, GuildMusicManager> guildMusicManagers;
+    private static final AudioPlayerManager apm = new DefaultAudioPlayerManager();
+    public static final Map<DiscordGuild, GuildMusicManager> guildMusicManagers = new HashMap<>();
 
     public MusicManager()
     {
-        this.apm = new DefaultAudioPlayerManager();
-        this.guildMusicManagers = new HashMap<>();
-
         AudioSourceManagers.registerLocalSource(apm);
         AudioSourceManagers.registerRemoteSources(apm);
     }
 
-    public synchronized GuildMusicManager getGuildMusicManager(DiscordGuild discordGuild)
+    public static synchronized GuildMusicManager getGuildMusicManager(DiscordGuild discordGuild)
     {
         GuildMusicManager guildMusicManager = guildMusicManagers.get(discordGuild);
 
@@ -47,13 +44,13 @@ public class MusicManager
         return guildMusicManager;
     }
 
-    public AudioPlayer getGuildAudioPlayer(DiscordGuild guild)
+    public static AudioPlayer getGuildAudioPlayer(DiscordGuild guild)
     {
         GuildMusicManager guildMusicManager = getGuildMusicManager(guild);
         return guildMusicManager.player;
     }
 
-    public void loadAndPlayURL(final TextChannel channel, final String trackURL)
+    public static void loadAndPlayURL(final TextChannel channel, final String trackURL)
     {
         DiscordGuild discordGuild = reference.discordGuilds.get(channel.getGuild().getIdLong());
 
@@ -96,19 +93,19 @@ public class MusicManager
         });
     }
 
-    public void play(DiscordGuild discordGuild, GuildMusicManager guildMusicManager, AudioTrack track)
+    public static void play(DiscordGuild discordGuild, GuildMusicManager guildMusicManager, AudioTrack track)
     {
         connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
         guildMusicManager.addToQueue(track);
     }
 
-    public void skip(DiscordGuild discordGuild)
+    public static void skip(DiscordGuild discordGuild)
     {
         GuildMusicManager musicManager = getGuildMusicManager(discordGuild);
         musicManager.nextTrack();
     }
 
-    public void connectToFirstVoiceChannel(AudioManager manager)
+    public static void connectToFirstVoiceChannel(AudioManager manager)
     {
         if(!manager.isConnected() && !manager.isAttemptingToConnect())
         {
@@ -120,15 +117,8 @@ public class MusicManager
         }
     }
 
-    public void connectToVoiceChannel(AudioManager manager, VoiceChannel channel)
+    public static void connectToVoiceChannel(AudioManager manager, VoiceChannel channel)
     {
         manager.openAudioConnection(channel);
-    }
-
-    public static MusicManager musicManager;
-    public static MusicManager getMusicManager()
-    {
-        if(musicManager == null) musicManager = new MusicManager();
-        return musicManager;
     }
 }

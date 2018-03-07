@@ -31,15 +31,12 @@ public class Reference
     public final String TWITCH_NAME = "DiscordStreamer";
     public final String TWITCH_SERVER = "irc.chat.twitch.tv";
 
-    public final String DISCORD_TOKEN = "";
+    public final String DISCORD_TOKEN = "NDE4MDEyNzM0NTA5Mjg1Mzc2.DXbZoA.2AhIM_1I7LmG4rVxmINuYmTlwQ8";
 
     public Map<Long, DiscordGuild> discordGuilds = new HashMap<>();
     public Map<String, BaseCommand> commands = new HashMap<>();
     public Map<TwitchChannel, DiscordGuild> twitchConnections = new HashMap<>();
     public Map<AudioPlayer, DiscordGuild> audioPlayers = new HashMap<>();
-
-    public String sqlURL;
-
 
     public JDA jda;
     public Client twitch;

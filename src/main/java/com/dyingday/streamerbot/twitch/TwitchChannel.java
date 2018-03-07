@@ -17,6 +17,7 @@ public class TwitchChannel
     private Channel channel;
     private DiscordGuild discordGuild;
     private TextChannel discordChannel;
+    private String commandChar = "/";
     private ArrayList<User> OPs = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
     private boolean streaming = false;
@@ -103,5 +104,10 @@ public class TwitchChannel
     public DiscordGuild getDiscordGuild()
     {
         return discordGuild;
+    }
+
+    public String getCommandChar()
+    {
+        return commandChar;
     }
 }

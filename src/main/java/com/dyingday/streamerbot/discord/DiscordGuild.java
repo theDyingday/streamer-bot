@@ -1,5 +1,7 @@
 package com.dyingday.streamerbot.discord;
 
+import com.dyingday.streamerbot.music.GuildMusicManager;
+import com.dyingday.streamerbot.music.MusicManager;
 import com.dyingday.streamerbot.twitch.TwitchChannel;
 import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.entities.Guild;
@@ -12,12 +14,14 @@ public class DiscordGuild
     private final long guildID;
     private Member owner;
     private String commandChar = "/";
+    private final GuildMusicManager guildMusicManager;
     private Reference reference = Reference.getReference();
     private ArrayList<TwitchChannel> connectedTwitchChannels = new ArrayList<>();
 
     public DiscordGuild(long guildID)
     {
         this.guildID = guildID;
+        this.guildMusicManager = MusicManager.getGuildMusicManager(this);
 
         reference.discordGuilds.put(guildID, this);
 
@@ -67,5 +71,10 @@ public class DiscordGuild
     public String getCommandChar()
     {
         return commandChar;
+    }
+
+    public GuildMusicManager getGuildMusicManager()
+    {
+        return guildMusicManager;
     }
 }

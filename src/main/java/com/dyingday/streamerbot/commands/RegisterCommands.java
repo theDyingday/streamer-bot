@@ -13,7 +13,6 @@ import java.util.List;
 public class RegisterCommands
 {
     private Reference reference = Reference.getReference();
-    private MusicManager musicManager = MusicManager.getMusicManager();
 
     @Command(name = "info", description = "Lists all commands and usages", usage = "info", type = ExecutorType.ALL, maxArgs = 0)
     private void info(User user)
@@ -52,20 +51,20 @@ public class RegisterCommands
     {
         if(args.length == 0)
         {
-            musicManager.connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
+            MusicManager.connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
         }
         else
         {
             List<VoiceChannel> channels = discordGuild.getGuild().getVoiceChannelsByName(args[0], true);
             if(channels.size() == 0)
             {
-                musicManager.connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
+                MusicManager.connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
                 channel.sendMessage("Could not find a channel with that name! Joining default channel; Feel free to move me using /move!").queue();
                 return;
             }
             else
             {
-                musicManager.connectToVoiceChannel(discordGuild.getGuild().getAudioManager(), channels.get(0));
+                MusicManager.connectToVoiceChannel(discordGuild.getGuild().getAudioManager(), channels.get(0));
             }
         }
         channel.sendMessage("Successfully joined channel: " + discordGuild.getGuild().getAudioManager().getConnectedChannel().getName()).queue();
