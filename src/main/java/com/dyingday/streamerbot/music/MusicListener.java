@@ -2,11 +2,15 @@ package com.dyingday.streamerbot.music;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
 import com.dyingday.streamerbot.utils.Reference;
+import com.dyingday.streamerbot.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.*;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import net.dv8tion.jda.core.EmbedBuilder;
+
+import java.awt.*;
 
 public class MusicListener extends AudioEventAdapter
 {
@@ -19,11 +23,11 @@ public class MusicListener extends AudioEventAdapter
 
         if(event instanceof PlayerPauseEvent)
         {
-            onPlayerPause(event.player, discordGuild);
+            onPlayerPause(event.player, event.player.getPlayingTrack(), discordGuild);
         }
         else if(event instanceof PlayerResumeEvent)
         {
-            onPlayerResume(event.player, discordGuild);
+            onPlayerResume(event.player, event.player.getPlayingTrack(), discordGuild);
         }
         else if(event instanceof TrackStartEvent)
         {
@@ -43,16 +47,21 @@ public class MusicListener extends AudioEventAdapter
         }
     }
 
-    private void onPlayerPause(AudioPlayer player, DiscordGuild discordGuild)
+    private void onPlayerPause(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Song Paused: ").setTitle(track.getInfo().title + " - " + track.getInfo().author, track.getInfo().uri).setFooter(Utils.getTimeStamp(track.getDuration()), null);
+        discordGuild.getMusicChannel().sendMessage(embedBuilder.build()).queue();
     }
 
-    private void onPlayerResume(AudioPlayer player, DiscordGuild discordGuild)
+    private void onPlayerResume(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
+        onTrackStart(player, track, discordGuild);
     }
 
     private void onTrackStart(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Now Playing: ").setTitle(track.getInfo().title + " - " + track.getInfo().author, track.getInfo().uri).setFooter(Utils.getTimeStamp(track.getDuration()), null);
+        discordGuild.getMusicChannel().sendMessage(embedBuilder.build()).queue();
     }
 
     private void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason, DiscordGuild discordGuild)

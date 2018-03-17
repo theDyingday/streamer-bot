@@ -1,14 +1,23 @@
 package com.dyingday.streamerbot.commands;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.discord.YouTubeSearchReaction;
 import com.dyingday.streamerbot.music.MusicManager;
+import com.dyingday.streamerbot.utils.Emotes;
 import com.dyingday.streamerbot.utils.ExecutorType;
 import com.dyingday.streamerbot.utils.Reference;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
+import java.awt.*;
 import java.time.Instant;
 import java.util.List;
+
+import static com.dyingday.streamerbot.utils.Utils.getStringFromArray;
+import static com.dyingday.streamerbot.utils.Utils.getTimeStamp;
 
 public class RegisterCommands
 {
@@ -30,20 +39,6 @@ public class RegisterCommands
                 privateChannel.sendMessage(emb.build()).queue();
             }
         });
-    }
-
-    @Command(name = "twitch", description = "Add/Remove a twitch account!", usage = "twitch <add|remove> <twitch stream username> <channel name>", channel = ChannelType.GROUP, minArgs = 3, maxArgs = 3)
-    private void twitch(String[] args, Guild guild, Member member)
-    {
-        if(args[0].equalsIgnoreCase("add"))
-        {
-            // TODO: Implement adding twitch account!
-
-        }
-        else if(args[1].equalsIgnoreCase("remove"))
-        {
-            // TODO: Sort out removing a twitch connection!
-        }
     }
 
     @Command(name = "join", description = "Joins the bot to voice channel", usage = "join [VoiceChannelName]", channel = ChannelType.GROUP, maxArgs = 1)
@@ -68,5 +63,55 @@ public class RegisterCommands
             }
         }
         channel.sendMessage("Successfully joined channel: " + discordGuild.getGuild().getAudioManager().getConnectedChannel().getName()).queue();
+    }
+
+    @Command(name = "search", description = "Searches for something...", channel = ChannelType.GROUP, minArgs = 1)
+    private void search(TextChannel channel, Member member, String[] args)
+    {
+        StringBuilder query = new StringBuilder();
+        for(String string : args) query.append(string).append("\n");
+        AudioPlaylist results = (AudioPlaylist) MusicManager.ytSearch.loadSearchResult(query.toString());
+        List<AudioTrack> tracks = results.getTracks();
+        EmbedBuilder embMessage = new EmbedBuilder().setColor(Color.RED).setAuthor("YouTube Search Results for: " + getStringFromArray(args), null,"https://storage.googleapis.com/gweb-uniblog-publish-prod/images/YouTube.max-2800x2800.png").setFooter("Page 1", null);
+        for(AudioTrack track : tracks)
+        {
+            if(tracks.indexOf(track) > 8) break;
+            embMessage.appendDescription(":" + Emotes.getNumberEmote(tracks.indexOf(track) + 1) + ": - " + getTimeStamp(track.getInfo().length) + " " + track.getInfo().title + " - " + track.getInfo().author + "\n");
+        }
+        channel.sendMessage(embMessage.build()).queue(message ->
+        {
+            for(int i = 1; i < (tracks.size() >= 10 ? 10 : tracks.size()); i++)
+            {
+                message.addReaction(EmojiParser.parseToUnicode(":" + Emotes.getNumberEmote(i) + ":")).queue();
+            }
+            if(tracks.size() > 9) message.addReaction(EmojiParser.parseToUnicode(":arrow_right:")).queue();
+
+            new YouTubeSearchReaction(message, new Member[]{member}, new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "arrow_right"}, results, getStringFromArray(args));
+        });
+    }
+
+    @Command(name = "play")
+    private void play(TextChannel channel, String[] args, DiscordGuild discordGuild)
+    {
+        if(args.length == 0) MusicManager.getGuildAudioPlayer(discordGuild).setPaused(false);
+        MusicManager.loadAndPlayURL(channel, args[0]);
+    }
+
+    @Command(name = "skip", description = "Skips current track!", channel = ChannelType.GROUP, maxArgs = 0)
+    private void skip(Guild guild)
+    {
+        MusicManager.skip(reference.discordGuilds.get(guild.getIdLong()));
+    }
+
+    @Command(name = "pause", description = "Pauses the currently playing song!", channel = ChannelType.GROUP, maxArgs = 0)
+    private void pause(DiscordGuild discordGuild)
+    {
+        MusicManager.getGuildAudioPlayer(discordGuild).setPaused(true);
+    }
+
+    @Command(name = "smc")
+    private void smc(TextChannel channel, DiscordGuild discordGuild)
+    {
+        discordGuild.setMusicChannel(channel);
     }
 }

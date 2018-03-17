@@ -6,6 +6,7 @@ import com.dyingday.streamerbot.twitch.TwitchChannel;
 import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.ArrayList;
 
@@ -15,10 +16,11 @@ public class DiscordGuild
     private Member owner;
     private String commandChar = "/";
     private final GuildMusicManager guildMusicManager;
+    private TextChannel musicChannel;
     private Reference reference = Reference.getReference();
     private ArrayList<TwitchChannel> connectedTwitchChannels = new ArrayList<>();
 
-    public DiscordGuild(long guildID)
+    public DiscordGuild(long guildID, boolean setup)
     {
         this.guildID = guildID;
         this.guildMusicManager = MusicManager.getGuildMusicManager(this);
@@ -26,6 +28,8 @@ public class DiscordGuild
         reference.discordGuilds.put(guildID, this);
 
         owner = getGuild().getOwner();
+
+        if(!setup) return;
 
         owner.getUser().openPrivateChannel().queue(privateChannel -> {
             privateChannel.sendMessage("Thank you for adding the Streamer Bot to your guild!\nEnjoy your time with it!").queue();
@@ -76,5 +80,15 @@ public class DiscordGuild
     public GuildMusicManager getGuildMusicManager()
     {
         return guildMusicManager;
+    }
+
+    public void setMusicChannel(TextChannel musicChannel)
+    {
+        this.musicChannel = musicChannel;
+    }
+
+    public TextChannel getMusicChannel()
+    {
+        return musicChannel == null ? getGuild().getDefaultChannel() : musicChannel;
     }
 }

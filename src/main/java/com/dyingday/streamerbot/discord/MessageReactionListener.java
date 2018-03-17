@@ -5,19 +5,25 @@ import net.dv8tion.jda.core.entities.Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class MessageReaction
+public abstract class MessageReactionListener
 {
     private Message message;
     private ArrayList<Member> membersCanReact = new ArrayList<>();
     private ArrayList<String> emotesCanAdd = new ArrayList<>();
 
-    public MessageReaction(Message message, Member[] membersCanReact, String[] emotesCanAdd)
+    public MessageReactionListener(Message message, Member[] membersCanReact, String[] emotesCanAdd)
     {
         this.message = message;
         this.membersCanReact.addAll(Arrays.asList(membersCanReact));
         this.emotesCanAdd.addAll(Arrays.asList(emotesCanAdd));
+
+        ReactionHandler.addListener(this);
+    }
+
+    protected void removeListener()
+    {
+        ReactionHandler.removeListener(this);
     }
 
     public boolean canMemberReact(Member member)
@@ -34,4 +40,6 @@ public class MessageReaction
     {
         return message;
     }
+
+    public abstract void onReaction(String emote, Member member);
 }

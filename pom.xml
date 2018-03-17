@@ -34,12 +34,12 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.5.1_342</version>
+            <version>3.5.1_350</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.2.45</version>
+            <version>1.2.56</version>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>

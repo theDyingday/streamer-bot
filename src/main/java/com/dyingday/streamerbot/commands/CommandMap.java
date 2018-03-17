@@ -114,7 +114,7 @@ public final class CommandMap
 
     private Object[] getCommand(String message, String commandChar)
     {
-        message = message.replace(commandChar, "");
+        message = message.replaceFirst(commandChar, "");
         String[] commandSplit = message.split(" ");
         String[] args = new String[commandSplit.length-1];
 
@@ -132,6 +132,7 @@ public final class CommandMap
         {
             if(parameters[i].getType() == String[].class) objects[i] = args;
             else if(parameters[i].getType() == User.class) objects[i] = event.getAuthor();
+            else if(parameters[i].getType() == Member.class) objects[i] = event.getMember();
             else if(parameters[i].getType() == TextChannel.class) objects[i] = event.getTextChannel();
             else if(parameters[i].getType() == PrivateChannel.class) objects[i] = event.getPrivateChannel();
             else if(parameters[i].getType() == Guild.class) objects[i] = event.getGuild();

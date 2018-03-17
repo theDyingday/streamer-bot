@@ -15,7 +15,7 @@ public class DisordEventListener implements EventListener
     {
         if(event instanceof GuildJoinEvent)
         {
-            new DiscordGuild(((GuildJoinEvent) event).getGuild().getIdLong());
+            new DiscordGuild(((GuildJoinEvent) event).getGuild().getIdLong(), true);
         }
         else if(event instanceof GuildUpdateOwnerEvent)
         {

@@ -1,35 +1,41 @@
 package com.dyingday.streamerbot.discord;
 
 import com.vdurmont.emoji.EmojiParser;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ReactionHandler extends ListenerAdapter
 {
-    private static Map<ReactionListener, MessageReaction> reactionListeners = new HashMap<>();
+    private static List<MessageReactionListener> listeners = new ArrayList<>();
 
-    public static void addListener(ReactionListener reactionListener, MessageReaction messageReaction)
+    public static void addListener(MessageReactionListener listener)
     {
-        if(!reactionListeners.keySet().contains(reactionListener)) reactionListeners.put(reactionListener, messageReaction);
+        if(!listeners.contains(listener)) listeners.add(listener);
     }
 
-    public static void removeListener(ReactionListener reactionListener)
+    public static void removeListener(MessageReactionListener listener)
     {
-        if(reactionListeners.keySet().contains(reactionListener)) reactionListeners.remove(reactionListener);
+        if(listeners.contains(listener)) listeners.remove(listener);
     }
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event)
     {
-        for(ReactionListener reactionListener : reactionListeners.keySet())
-            reactionListener.onReaction(EmojiParser.parseToAliases(event.getReactionEmote().getName()).replaceAll(":", ""), reactionListeners.get(reactionListener));
+        if(event.getUser().isBot()) return;
+        // Used a copy array to avoid Concurrent Modification Exception but maybe try a more elegant solution?
+        MessageReactionListener[] copyArray = new MessageReactionListener[listeners.size()];
+        listeners.toArray(copyArray);
+        for(MessageReactionListener listener : copyArray)
+        {
+            String emoji = EmojiParser.parseToAliases(event.getReactionEmote().getName()).replaceAll(":", "");
+            if(listener.getMessage().getId().equals(event.getMessageId()) && listener.canAddEmote(emoji) && listener.canMemberReact(event.getMember()))
+            {
+                listener.onReaction(emoji, event.getMember());
+                event.getReaction().removeReaction(event.getUser()).queue();
+            }
+        }
     }
 }

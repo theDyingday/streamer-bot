@@ -2,10 +2,13 @@ package com.dyingday.streamerbot.music;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
 import com.dyingday.streamerbot.utils.Reference;
+import com.dyingday.streamerbot.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.core.EmbedBuilder;
 
+import java.awt.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -25,6 +28,8 @@ public class GuildMusicManager
         this.queue = new LinkedBlockingQueue<>();
         this.discordGuild = discordGuild;
 
+        this.player.addListener(new MusicListener());
+
         reference.audioPlayers.put(player, discordGuild);
     }
 
@@ -33,6 +38,7 @@ public class GuildMusicManager
         if(!player.startTrack(track, true))
         {
             queue.offer(track);
+            discordGuild.getMusicChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setAuthor("Added to Queue:").setTitle(track.getInfo().title + " - " + track.getInfo().author, track.getInfo().uri).setFooter(Utils.getTimeStamp(track.getDuration()), null).build()).queue();
         }
     }
 

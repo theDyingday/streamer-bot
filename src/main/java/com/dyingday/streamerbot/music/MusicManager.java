@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -23,6 +25,8 @@ public class MusicManager
 
     private static final AudioPlayerManager apm = new DefaultAudioPlayerManager();
     public static final Map<DiscordGuild, GuildMusicManager> guildMusicManagers = new HashMap<>();
+    private static YoutubeAudioSourceManager yasm = new YoutubeAudioSourceManager();
+    public static YoutubeSearchProvider ytSearch = new YoutubeSearchProvider(yasm);
 
     public MusicManager()
     {
@@ -37,9 +41,9 @@ public class MusicManager
         if(guildMusicManager == null)
         {
             guildMusicManager = new GuildMusicManager(apm, discordGuild);
+            guildMusicManagers.put(discordGuild, guildMusicManager);
+            discordGuild.getGuild().getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
         }
-
-        discordGuild.getGuild().getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
 
         return guildMusicManager;
     }
@@ -61,7 +65,7 @@ public class MusicManager
             public void trackLoaded(AudioTrack track)
             {
                 channel.sendMessage("Adding to queue: " + track.getInfo().title).queue();
-                play(discordGuild, guildMusicManager, track);
+                play(discordGuild, track);
             }
 
             @Override
@@ -76,7 +80,7 @@ public class MusicManager
 
                 channel.sendMessage("Adding to queue: " + firstTrack.getInfo().title + " (first track of playlist: " + playlist.getName() + ")").queue();
 
-                play(discordGuild, guildMusicManager, firstTrack);
+                play(discordGuild, firstTrack);
             }
 
             @Override
@@ -93,10 +97,10 @@ public class MusicManager
         });
     }
 
-    public static void play(DiscordGuild discordGuild, GuildMusicManager guildMusicManager, AudioTrack track)
+    public static void play(DiscordGuild discordGuild, AudioTrack track)
     {
         connectToFirstVoiceChannel(discordGuild.getGuild().getAudioManager());
-        guildMusicManager.addToQueue(track);
+        discordGuild.getGuildMusicManager().addToQueue(track);
     }
 
     public static void skip(DiscordGuild discordGuild)
@@ -120,5 +124,10 @@ public class MusicManager
     public static void connectToVoiceChannel(AudioManager manager, VoiceChannel channel)
     {
         manager.openAudioConnection(channel);
+    }
+
+    public static boolean isConnectedToVoice(AudioManager manager)
+    {
+        return manager.isConnected();
     }
 }
