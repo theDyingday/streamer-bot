@@ -86,7 +86,7 @@ public class MusicManager
             @Override
             public void noMatches()
             {
-                channel.sendMessage("Nothing found by the url: " + trackURL).queue();
+                channel.sendMessage("Nothing found by that url! ").queue();
             }
 
             @Override

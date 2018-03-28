@@ -1,6 +1,7 @@
 package com.dyingday.streamerbot.music;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.utils.Emotes;
 import com.dyingday.streamerbot.utils.Reference;
 import com.dyingday.streamerbot.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -11,6 +12,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.awt.*;
+import java.time.Instant;
+import java.util.ArrayList;
 
 public class MusicListener extends AudioEventAdapter
 {
@@ -49,18 +52,33 @@ public class MusicListener extends AudioEventAdapter
 
     private void onPlayerPause(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
-        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Song Paused: ").setTitle(track.getInfo().title + " - " + track.getInfo().author, track.getInfo().uri).setFooter(Utils.getTimeStamp(track.getDuration()), null);
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Song Paused: ").setTitle(track.getInfo().title + " - " + track.getInfo().author + " - " + Utils.getTimeStamp(track.getDuration()), track.getInfo().uri).setTimestamp(Instant.now());
+        ArrayList<AudioTrack> queue = discordGuild.getGuildMusicManager().getQueue();
+        if(queue.size() != 0) embedBuilder.appendDescription("**Queue:**" + "\n");
+        for(int i = 0; i < (queue.size() > 9 ? 9 : queue.size()); i++)
+        {
+            embedBuilder.appendDescription(":" + Emotes.getNumberEmote(i+1) + ": :- " + queue.get(i).getInfo().title + " - " + queue.get(i).getInfo().author + " - " + Utils.getTimeStamp(queue.get(i).getDuration()));
+        }
         discordGuild.getMusicChannel().sendMessage(embedBuilder.build()).queue();
     }
 
     private void onPlayerResume(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
-        onTrackStart(player, track, discordGuild);
+            onTrackStart(player, track, discordGuild);
     }
 
     private void onTrackStart(AudioPlayer player, AudioTrack track, DiscordGuild discordGuild)
     {
-        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Now Playing: ").setTitle(track.getInfo().title + " - " + track.getInfo().author, track.getInfo().uri).setFooter(Utils.getTimeStamp(track.getDuration()), null);
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GREEN).setAuthor("Now Playing: ").setTitle(track.getInfo().title + " - " + track.getInfo().author + " - " + Utils.getTimeStamp(track.getDuration()), track.getInfo().uri).setTimestamp(Instant.now());
+        if(track.getInfo().uri.startsWith("https://www.youtube.com")) {
+            embedBuilder.setImage("https://img.youtube.com/vi/" + track.getInfo().uri.replace("https://www.youtube.com/watch?v=", "") + "/0.jpg");
+        }
+        ArrayList<AudioTrack> queue = discordGuild.getGuildMusicManager().getQueue();
+        if(queue.size() != 0) embedBuilder.appendDescription("**Queue:**" + "\n");
+        for(int i = 0; i < (queue.size() > 9 ? 9 : queue.size()); i++)
+        {
+            embedBuilder.appendDescription(":" + Emotes.getNumberEmote(i+1) + ": :- " + queue.get(i).getInfo().title + " - " + queue.get(i).getInfo().author + " - " + Utils.getTimeStamp(queue.get(i).getDuration()));
+        }
         discordGuild.getMusicChannel().sendMessage(embedBuilder.build()).queue();
     }
 

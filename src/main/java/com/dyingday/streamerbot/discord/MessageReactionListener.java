@@ -2,6 +2,7 @@ package com.dyingday.streamerbot.discord;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,9 +22,19 @@ public abstract class MessageReactionListener
         ReactionHandler.addListener(this);
     }
 
-    protected void removeListener()
+    void setMessage(Message message)
+    {
+        this.message = message;
+    }
+
+    void removeListener()
     {
         ReactionHandler.removeListener(this);
+    }
+
+    void setMembersCanReact(ArrayList<Member> membersCanReact)
+    {
+        this.membersCanReact = membersCanReact;
     }
 
     public boolean canMemberReact(Member member)
@@ -41,5 +52,5 @@ public abstract class MessageReactionListener
         return message;
     }
 
-    public abstract void onReaction(String emote, Member member);
+    public abstract void onReaction(String emote, MessageReactionAddEvent event);
 }

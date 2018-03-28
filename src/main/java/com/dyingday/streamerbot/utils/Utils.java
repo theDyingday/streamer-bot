@@ -9,6 +9,17 @@ public class Utils
         return stringBuilder.toString();
     }
 
+    public static String getStringFromArray(String[] strings, int startPos, int endPos)
+    {
+        String[] arr = new String[endPos - startPos];
+        for(int i = 0; i < strings.length; i++)
+        {
+            if(i >= startPos && i < endPos)
+                arr[i - startPos] = strings[i];
+        }
+        return getStringFromArray(arr);
+    }
+
     public static String getTimeStamp(long videoLength)
     {
         videoLength /= 1000;

@@ -16,7 +16,7 @@ public class ReactionHandler extends ListenerAdapter
         if(!listeners.contains(listener)) listeners.add(listener);
     }
 
-    public static void removeListener(MessageReactionListener listener)
+    protected static void removeListener(MessageReactionListener listener)
     {
         if(listeners.contains(listener)) listeners.remove(listener);
     }
@@ -25,7 +25,7 @@ public class ReactionHandler extends ListenerAdapter
     public void onMessageReactionAdd(MessageReactionAddEvent event)
     {
         if(event.getUser().isBot()) return;
-        // Used a copy array to avoid Concurrent Modification Exception but maybe try a more elegant solution?
+        // Used a copy array to avoid Concurrent Modification Exception; Maybe try a more elegant solution?
         MessageReactionListener[] copyArray = new MessageReactionListener[listeners.size()];
         listeners.toArray(copyArray);
         for(MessageReactionListener listener : copyArray)
@@ -33,7 +33,7 @@ public class ReactionHandler extends ListenerAdapter
             String emoji = EmojiParser.parseToAliases(event.getReactionEmote().getName()).replaceAll(":", "");
             if(listener.getMessage().getId().equals(event.getMessageId()) && listener.canAddEmote(emoji) && listener.canMemberReact(event.getMember()))
             {
-                listener.onReaction(emoji, event.getMember());
+                listener.onReaction(emoji, event);
                 event.getReaction().removeReaction(event.getUser()).queue();
             }
         }

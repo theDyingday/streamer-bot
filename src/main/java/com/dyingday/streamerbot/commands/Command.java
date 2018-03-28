@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
 public @interface Command
 {
     String name();
-    String description() default "No description has been provided for this discordCommand!";
-    String usage() default "No usage has been provided for this discordCommand!";
+    String description() default "No description has been provided for this command!";
+    String usage() default RegisterCommands.NO_USAGE;
     int maxArgs() default -1;
     int minArgs() default -1;
     ChannelType channel() default ChannelType.UNKNOWN; /* Unknown is used as a way of setting it to Private or Guild Channel*/

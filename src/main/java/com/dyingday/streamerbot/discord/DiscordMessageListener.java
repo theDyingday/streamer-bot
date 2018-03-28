@@ -25,6 +25,16 @@ public class DiscordMessageListener extends ListenerAdapter
 
             if(!event.getMessage().getContentRaw().startsWith(discordGuild.getCommandChar()))
             {
+                for(String bannedWord : discordGuild.getBannedWords()) {
+                    if(event.getMessage().getContentRaw().contains(bannedWord) && !discordGuild.isMemberMod(event.getMember())) {
+                        discordGuild.addWarning(event.getAuthor());
+                    }
+                }
+                if(!discordGuild.isMessageAllowed(event.getTextChannel(), event.getMember(), event.getMessage()))
+                {
+                    event.getMessage().delete().queue();
+                    return;
+                }
                 for(TwitchChannel channel : discordGuild.getConnectedTwitchChannels())
                 {
                     if(channel.isStreaming() && channel.getDiscordChannel().equals(event.getTextChannel()))
