@@ -4,8 +4,9 @@ import com.dyingday.streamerbot.commands.BaseCommand;
 import com.dyingday.streamerbot.commands.CommandMap;
 import com.dyingday.streamerbot.discord.DiscordGuild;
 import com.dyingday.streamerbot.twitch.TwitchChannel;
-import com.dyingday.streamerbot.twitch.TwitchHandler;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.JDA;
+import org.kitteh.irc.client.library.Client;
 
 import java.awt.*;
 import java.util.Collection;
@@ -27,15 +28,18 @@ public class Reference
 
     public final int TWITCH_PORT = 6667;
     public final String TWITCH_OAUTH = "";
-    public final String DISCORD_TOKEN = "";
+    public final String TWITCH_NAME = "DiscordStreamer";
+    public final String TWITCH_SERVER = "irc.chat.twitch.tv";
+
+    public final String DISCORD_TOKEN = "NDE4MDEyNzM0NTA5Mjg1Mzc2.DXbZoA.2AhIM_1I7LmG4rVxmINuYmTlwQ8";
 
     public Map<Long, DiscordGuild> discordGuilds = new HashMap<>();
     public Map<String, BaseCommand> commands = new HashMap<>();
     public Map<TwitchChannel, DiscordGuild> twitchConnections = new HashMap<>();
-
+    public Map<AudioPlayer, DiscordGuild> audioPlayers = new HashMap<>();
 
     public JDA jda;
-    public TwitchHandler twitch;
+    public Client twitch;
     public CommandMap commandMap;
 
     public Collection<BaseCommand> getCommands()

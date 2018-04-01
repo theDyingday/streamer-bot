@@ -1,6 +1,8 @@
 package com.dyingday.streamerbot.commands;
 
 import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.twitch.TwitchChannel;
+import com.dyingday.streamerbot.utils.ExecutorType;
 import com.dyingday.streamerbot.utils.Reference;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
@@ -35,34 +37,85 @@ public final class CommandMap
             {
                 Command command = method.getAnnotation(Command.class);
                 method.setAccessible(true);
-                BaseCommand baseCommand = new BaseCommand(command.name(), command.description(), command.usage(), command.type(), object, method);
+                BaseCommand baseCommand = new BaseCommand(command.name(), command.description(), command.usage(), command.maxArgs(), command.minArgs(), command.channel(), command.type(), object, method);
                 reference.commands.put(command.name().toLowerCase(), baseCommand);
             }
         }
     }
 
-    public void command(MessageReceivedEvent event)
+    // Discord Command
+    public void discordCommand(MessageReceivedEvent event, String commandChar)
     {
-        Object[] object = getCommand(event.getMessage().getContentRaw());
-        BaseCommand baseCommand = (BaseCommand) object[0];
-        if(object[0] == null)
+        Object[] object = getCommand(event.getMessage().getContentRaw(), commandChar);
+        BaseCommand command = (BaseCommand) object[0];
+        String[] args = (String[]) object[1];
+        if(object[0] == null )
+        {
+            return;
+        }
+        else if((event.getChannel() instanceof PrivateChannel && command.getChannelType() == ChannelType.GROUP)
+                || event.getChannel() instanceof TextChannel && command.getChannelType() == ChannelType.PRIVATE)
+        {
+            return;
+        }
+        else if(command.getMaxArgs() != -1 && args.length > command.getMaxArgs())
+        {
+            event.getChannel().sendMessage("You have entered too many arguments!").queue();
+            return;
+        }
+        else if(command.getMinArgs() != -1 && args.length < command.getMinArgs())
+        {
+            event.getChannel().sendMessage("You have entered too few arguments!").queue();
+            return;
+        }
+        else if(command.getExecutorType() == ExecutorType.TWITCH)
         {
             return;
         }
         try
         {
-            execute(baseCommand, ((BaseCommand) object[0]).getName(), (String[])object[1], event);
+            execute(command, args, event);
         }
         catch (Exception e)
         {
-            System.out.println("The method " + baseCommand.getMethod().getName() + " isn't correct!");
+            System.out.println("The method " + command.getMethod().getName() + " isn't correct!");
         }
     }
 
-    private Object[] getCommand(String command)
+    public void twitchCommand(TwitchChannel channel, String message, String sender)
     {
-        command = command.replace("/", "");
-        String[] commandSplit = command.split(" ");
+        Object[] object = getCommand(message, channel.getCommandChar());
+        BaseCommand command = (BaseCommand) object[0];
+        String[] args = (String[]) object[1];
+        if(object[0] == null) return;
+        else if(command.getMaxArgs() != -1 && args.length > command.getMaxArgs())
+        {
+            reference.twitch.sendMessage(channel.getChannel(), sender + " you have entered too many arguments for the " + command.getName() + " command!");
+            return;
+        }
+        else if(command.getMinArgs() != -1 && args.length < command.getMinArgs())
+        {
+            reference.twitch.sendMessage(channel.getChannel(), sender + " you have entered too few arguments for the " + command.getName() + " command!");
+            return;
+        }
+        else if(command.getExecutorType() == ExecutorType.DISCORD)
+        {
+            return;
+        }
+        try
+        {
+            execute(command, args, channel, sender);
+        }
+        catch (Exception e)
+        {
+            System.out.println("The method " + command.getMethod().getName() + " isn't correct!");
+        }
+    }
+
+    private Object[] getCommand(String message, String commandChar)
+    {
+        message = message.replaceFirst(commandChar, "");
+        String[] commandSplit = message.split(" ");
         String[] args = new String[commandSplit.length-1];
 
         System.arraycopy(commandSplit, 1, args, 0, commandSplit.length - 1);
@@ -71,27 +124,48 @@ public final class CommandMap
         return new Object[]{baseCommand, args};
     }
 
-    private void execute(BaseCommand baseCommand, String command, String[] args, MessageReceivedEvent event)
+    private void execute(BaseCommand command, String[] args, MessageReceivedEvent event)
     {
-        Parameter[] parameters = baseCommand.getMethod().getParameters();
+        Parameter[] parameters = command.getMethod().getParameters();
         Object[] objects = new Object[parameters.length];
         for(int i = 0; i < parameters.length; i++)
         {
             if(parameters[i].getType() == String[].class) objects[i] = args;
             else if(parameters[i].getType() == User.class) objects[i] = event.getAuthor();
+            else if(parameters[i].getType() == Member.class) objects[i] = event.getMember();
             else if(parameters[i].getType() == TextChannel.class) objects[i] = event.getTextChannel();
             else if(parameters[i].getType() == PrivateChannel.class) objects[i] = event.getPrivateChannel();
             else if(parameters[i].getType() == Guild.class) objects[i] = event.getGuild();
-            else if(parameters[i].getType() == String.class) objects[i] = command;
+            else if(parameters[i].getType() == String.class) objects[i] = command.getName();
             else if(parameters[i].getType() == Message.class) objects[i] = event.getMessage();
             else if(parameters[i].getType() == JDA.class) objects[i] = reference.jda;
             else if(parameters[i].getType() == MessageChannel.class) objects[i] = event.getChannel();
-            else if(parameters[i].getType() == BaseCommand.class) objects[i] = baseCommand;
+            else if(parameters[i].getType() == BaseCommand.class) objects[i] = command;
             else if(parameters[i].getType() == DiscordGuild.class) objects[i] = reference.discordGuilds.get(event.getGuild().getIdLong());
         }
         try
         {
-            baseCommand.getMethod().invoke(baseCommand.getObject(), objects);
+            command.getMethod().invoke(command.getObject(), objects);
+        }
+        catch (IllegalAccessException | InvocationTargetException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void execute(BaseCommand command, String[] args, TwitchChannel channel, String sender) {
+        Parameter[] parameters = command.getMethod().getParameters();
+        Object[] objects = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++)
+        {
+            if(parameters[i].getType() == String[].class) objects[i] = args;
+            else if(parameters[i].getType() == String.class) objects[i] = sender;
+            else if(parameters[i].getType() == TwitchChannel.class) objects[i] = channel;
+            else if(parameters[i].getType() == DiscordGuild.class) objects[i] = reference.twitchConnections.get(channel);
+        }
+        try
+        {
+            command.getMethod().invoke(command.getObject(), objects);
         }
         catch (IllegalAccessException | InvocationTargetException e)
         {

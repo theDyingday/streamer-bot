@@ -1,63 +1,113 @@
 package com.dyingday.streamerbot.twitch;
 
-import org.jibble.pircbot.PircBot;
-import org.jibble.pircbot.User;
+import com.dyingday.streamerbot.discord.DiscordGuild;
+import com.dyingday.streamerbot.utils.Reference;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
+import org.kitteh.irc.client.library.element.Channel;
+import org.kitteh.irc.client.library.element.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TwitchChannel
 {
-    private String channelName;
-    private long discordChannelID;
+    private Reference reference = Reference.getReference();
+
+    private Member owner;
+    private Channel channel;
+    private DiscordGuild discordGuild;
+    private TextChannel discordChannel;
+    private String commandChar = "/";
     private ArrayList<User> OPs = new ArrayList<>();
-    private Map<String, String> replies = new HashMap<>();
+    private ArrayList<User> users = new ArrayList<>();
+    private boolean streaming = false;
 
-    public TwitchChannel(String channelName, long discordChannelID)
+    public TwitchChannel(Member owner, String channelName, TextChannel discordChannel, DiscordGuild discordGuild)
     {
-        this.channelName = "#" + channelName;
-        this.discordChannelID = discordChannelID;
+        this.owner = owner;
+        this.discordChannel = discordChannel;
+        this.discordGuild = discordGuild;
+
+        reference.twitch.addChannel("#" + channelName);
+        this.channel = reference.twitch.getChannel("#" + channelName).get();
     }
 
-    public void addOp(User user)
+    public void addOp(User op)
     {
-        OPs.add(user);
+        if(!OPs.contains(op)) OPs.add(op);
     }
 
-    public void removeOp(User user)
+    public void removeOp(User op)
     {
-        if(OPs.contains(user)) OPs.remove(user);
+        if(OPs.contains(op)) OPs.remove(op);
+    }
+
+    public void addUser(User user)
+    {
+        if(!users.contains(user)) users.add(user);
+    }
+
+    public void removeUser(User user)
+    {
+        if(users.contains(user)) users.remove(user);
+    }
+
+    public Channel getChannel()
+    {
+        return channel;
+    }
+
+    public Member getOwner()
+    {
+        return owner;
+    }
+
+    public void setOwner(Member owner)
+    {
+        this.owner = owner;
+    }
+
+    public TextChannel getDiscordChannel() {
+        return discordChannel;
+    }
+
+    public boolean setDiscordChannel(TextChannel discordChannel)
+    {
+        if(this.discordGuild.getGuild().getTextChannels().contains(discordChannel))
+        {
+            this.discordChannel = discordChannel;
+            return true;
+        }
+        return false;
     }
 
     public User[] getOPs()
     {
-        User[] users = new User[OPs.size()];
-        return OPs.toArray(users);
+        return OPs.toArray(new User[OPs.size()]);
     }
 
-    public String getChannelName()
+    public boolean isStreaming()
     {
-        return channelName;
+        return streaming;
     }
 
-    public String getRawChannelName()
+    public void toggleStreaming()
     {
-        return channelName.replace("#", "");
+        streaming = !streaming;
     }
 
-    public void setChannelName(String channelName)
+    public void setStreaming(boolean streaming)
     {
-        this.channelName = channelName;
+        this.streaming = streaming;
     }
 
-    public long getDiscordChannelID()
+    public DiscordGuild getDiscordGuild()
     {
-        return discordChannelID;
+        return discordGuild;
     }
 
-    public void setDiscordChannelID(long discordChannelID)
+    public String getCommandChar()
     {
-        this.discordChannelID = discordChannelID;
+        return commandChar;
     }
 }
